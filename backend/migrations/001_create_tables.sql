@@ -87,14 +87,14 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 
 -- Create indexes for better query performance
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_games_title ON games(title);
-CREATE INDEX idx_games_studio ON games(studio_id);
-CREATE INDEX idx_usergames_user ON user_games(user_id);
-CREATE INDEX idx_usergames_game ON user_games(game_id);
-CREATE INDEX idx_reviews_game ON reviews(game_id);
-CREATE INDEX idx_reviews_user ON reviews(user_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_games_title ON games(title);
+CREATE INDEX IF NOT EXISTS idx_games_studio ON games(studio_id);
+CREATE INDEX IF NOT EXISTS idx_usergames_user ON user_games(user_id);
+CREATE INDEX IF NOT EXISTS idx_usergames_game ON user_games(game_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_game ON reviews(game_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_user ON reviews(user_id);
 
 -- Create trigger function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -106,17 +106,22 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create triggers for each table
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_studios_updated_at ON studios;
 CREATE TRIGGER update_studios_updated_at BEFORE UPDATE ON studios
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_games_updated_at ON games;
 CREATE TRIGGER update_games_updated_at BEFORE UPDATE ON games
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_usergames_updated_at ON user_games;
 CREATE TRIGGER update_usergames_updated_at BEFORE UPDATE ON user_games
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_reviews_updated_at ON reviews;
 CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
