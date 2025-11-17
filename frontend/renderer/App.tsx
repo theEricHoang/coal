@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import SignIn from './components/Auth/SignIn';
+
+
+import SignIn from './components/Auth/Signin';
 import SignUp from './components/Auth/SignUp';
 import LibraryView from './components/Library/LibraryView';
 import GameUpload from './components/Upload/GameUpload';
 import Navbar from './components/Layout/Navbar';
 
+
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated (check token in localStorage)
     const token = localStorage.getItem('authToken');
     setIsAuthenticated(!!token);
   }, []);
 
+  
   return (
     <Router>
+      
       {isAuthenticated && <Navbar onLogout={() => setIsAuthenticated(false)} />}
       <Routes>
         <Route 
@@ -50,3 +54,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
