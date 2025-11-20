@@ -1,10 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
-  entry: './src/renderer/index.tsx',
-  target: 'electron-renderer',
+  entry: './renderer/index.tsx',
+  target: 'web',
   devtool: 'source-map',
   module: {
     rules: [
@@ -21,6 +22,11 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    fallback: {
+      "process": require.resolve("process/browser.js"),
+      "util": false,
+      "buffer": false
+    }
   },
   output: {
     filename: 'bundle.js',
@@ -28,8 +34,11 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/renderer/index.html',
+      template: './renderer/index.html',
     }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser.js',
+    })
   ],
   devServer: {
     static: {
