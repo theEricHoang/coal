@@ -23,14 +23,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install psycopg2-binary for PostgreSQL connection
 RUN pip install --no-cache-dir psycopg2-binary
 
-# Copy application code
-COPY . .
-
-# Make entrypoint script executable
+# Copy entrypoint before everything else
+COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
+# Copy the rest of the application code
+COPY . .
 
 # Expose port
 EXPOSE 8000
 
-# Run the entrypoint script
-CMD ["/app/entrypoint.sh"]
+# Use ENTRYPOINT instead of CMD for scripts
+ENTRYPOINT ["/app/entrypoint.sh"]
