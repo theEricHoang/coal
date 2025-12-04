@@ -58,3 +58,13 @@ def health_check():
         "status": "healthy",
         "database": "connected"
     }
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # during development
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
