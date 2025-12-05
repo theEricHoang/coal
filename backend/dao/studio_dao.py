@@ -53,7 +53,7 @@ class StudioDAO:
     def get_all(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
         """Get all studios with pagination"""
         query = """
-            SELECT studio_id, name, logo, contact_info, created_at, updated_at
+            SELECT studio_id, name, logo, contact_info, user_id, created_at, updated_at
             FROM studios
             ORDER BY name
             LIMIT %s OFFSET %s

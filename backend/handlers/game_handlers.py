@@ -140,6 +140,11 @@ def search_games(
     else:
         games = game_dao.get_all(limit=page_size, offset=offset)
     
+    # Convert thumbnail paths to full URLs
+    for game in games:
+        if game.get('thumbnail'):
+            game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
+    
     total = game_dao.count()
     
     return {
@@ -163,6 +168,10 @@ def get_game(game_id: int, db=Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Game not found"
         )
+    
+    # Convert thumbnail path to full URL
+    if game.get('thumbnail'):
+        game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
     
     # Get additional stats
     average_rating = review_dao.get_average_rating(game_id)

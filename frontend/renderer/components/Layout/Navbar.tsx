@@ -12,6 +12,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const location = useLocation();
   const username = localStorage.getItem('username') || 'User';
+  const userRole = localStorage.getItem('userRole') || '';
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string>(monk_pfp);
 
@@ -50,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       <div className="navbar-container">
         {/* Logo/Brand */}
         <div className="navbar-left">
-          <Link to="/library" className="navbar-brand">
+          <Link to={userRole === 'studio' ? '/publish' : '/library'} className="navbar-brand">
             <img src={coal_logo} alt="COAL Logo" className="navbar-logo" />
           </Link>
 
@@ -62,12 +63,21 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
             >
               store
             </Link>
-            <Link
-              to="/library"
-              className={`navbar-link ${isActive('/library') ? 'active' : ''}`}
-            >
-              library
-            </Link>
+            {userRole === 'studio' ? (
+              <Link
+                to="/publish"
+                className={`navbar-link ${isActive('/publish') ? 'active' : ''}`}
+              >
+                publish
+              </Link>
+            ) : (
+              <Link
+                to="/library"
+                className={`navbar-link ${isActive('/library') ? 'active' : ''}`}
+              >
+                library
+              </Link>
+            )}
           </div>
         </div>
 
