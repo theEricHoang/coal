@@ -13,9 +13,7 @@ html, body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Roboto';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #0f172a;
@@ -30,17 +28,21 @@ body {
 /* CSS Custom Properties (Design Tokens) */
 :root {
   /* Colors */
-  --color-bg-primary: #0f172a;
-  --color-bg-secondary: #1e293b;
-  --color-bg-tertiary: #334155;
+  --color-bg-primary: #252529;
+  --color-bg-secondary: #1D1D1D;
+  --color-bg-tertiary: #2e3036;
   
   --color-text-primary: #ffffff;
   --color-text-secondary: #e2e8f0;
-  --color-text-muted: #94a3b8;
+  --color-text-muted: #565656;
   
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-primary-dark: #1e40af;
+  --color-primary: #5F78AF;
+  --color-primary-hover: #4F638E;
+  --color-primary-dark: #41506F;
+
+  --color-secondary: #353940;
+  --color-secondary-hover: #2c2f36;
+  --color-secondary-dark: #202226;
   
   --color-success: #10b981;
   --color-success-bg: #d1fae5;

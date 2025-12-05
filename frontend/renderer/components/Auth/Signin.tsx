@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { authAPI, handleApiError } from '../../services/api';
 import { UserLogin } from '../../types';
 import './Signin.css';
+import coal_logo from '../../assets/coal_logo.png';
 
 interface SignInProps {
   onSignIn: () => void;
@@ -47,11 +48,12 @@ const SignIn: React.FC<SignInProps> = ({ onSignIn }) => {
     <div className="signin-container">
       <div className="signin-card">
         <div className="signin-header">
+          <img src={coal_logo} alt="COAL Logo" className="signin-logo" />
           <h2 className="signin-title">
-            Welcome Back
+            COAL
           </h2>
           <p className="signin-subtitle">
-            Sign in to access your game library
+            sign in
           </p>
         </div>
 
@@ -61,54 +63,42 @@ const SignIn: React.FC<SignInProps> = ({ onSignIn }) => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              className="form-input"
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              className="form-input"
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <button
-            type="submit"
+        <form className="form" onSubmit={handleSubmit}>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="email"
+            className="form-input"
+            required
             disabled={loading}
-            className="submit-button"
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+          />
 
-        <div className="signin-footer">
-          Don't have an account?{' '}
-          <Link to="/signup" className="signin-link">
-            Sign Up
-          </Link>
-        </div>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="password"
+            className="form-input"
+            required
+            disabled={loading}
+          />
+
+          <div className="form-buttons">
+            <Link to="/signup" className="signup-button">
+              sign up
+            </Link>
+            <button
+              type="submit"
+              disabled={loading}
+              className="submit-button"
+            >
+              {loading ? 'signing in...' : 'sign in'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

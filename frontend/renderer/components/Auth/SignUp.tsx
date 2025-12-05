@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authAPI, handleApiError } from '../../services/api';
 import { UserCreate } from '../../types';
 import './SignUp.css';
+import coal_logo from '../../assets/coal_logo.png';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -77,11 +78,12 @@ const SignUp: React.FC = () => {
     <div className="signup-container">
       <div className="signup-card">
         <div className="signup-header">
+          <img src={coal_logo} alt="COAL Logo" className="signup-logo" />
           <h2 className="signup-title">
-            Create Account
+            COAL
           </h2>
           <p className="signup-subtitle">
-            Join our gaming community today
+            sign up
           </p>
         </div>
 
@@ -97,102 +99,75 @@ const SignUp: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Choose a username"
-              className="form-input"
-              required
-              disabled={loading || success}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              className="form-input"
-              required
-              disabled={loading || success}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              Account Type
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="form-select"
-              disabled={loading || success}
-            >
-              <option value="user">User (Player)</option>
-              <option value="studio">Studio/Publisher</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Create a password (min. 6 characters)"
-              className="form-input"
-              required
-              disabled={loading || success}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={confirmPassword}
-              onChange={handleChange}
-              placeholder="Re-enter your password"
-              className="form-input"
-              required
-              disabled={loading || success}
-            />
-          </div>
-
-          <button
-            type="submit"
+        <form className="form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="username"
+            className="form-input"
+            required
             disabled={loading || success}
-            className="submit-button"
-          >
-            {loading ? 'Creating Account...' : success ? 'Success!' : 'Sign Up'}
-          </button>
-        </form>
+          />
 
-        <div className="signup-footer">
-          Already have an account?{' '}
-          <Link to="/signin" className="signup-link">
-            Sign In
-          </Link>
-        </div>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="email"
+            className="form-input"
+            required
+            disabled={loading || success}
+          />
+
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="form-select"
+            disabled={loading || success}
+          >
+            <option value="user">user (player)</option>
+            <option value="studio">studio/publisher</option>
+          </select>
+
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="password (min. 6 characters)"
+            className="form-input"
+            required
+            disabled={loading || success}
+          />
+
+          <input
+            type="password"
+            name="confirmPassword"
+            value={confirmPassword}
+            onChange={handleChange}
+            placeholder="confirm password"
+            className="form-input"
+            required
+            disabled={loading || success}
+          />
+
+          <div className="form-buttons">
+            <Link to="/signin" className="signin-button">
+              sign in
+            </Link>
+            <button
+              type="submit"
+              disabled={loading || success}
+              className="submit-button"
+            >
+              {loading ? 'creating account...' : success ? 'success!' : 'sign up'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
