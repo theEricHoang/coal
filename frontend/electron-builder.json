@@ -1,6 +1,6 @@
 {
-  "appId": "com.gamelibrary.app",
-  "productName": "Game Library",
+  "appId": "com.coal.app",
+  "productName": "coal",
   "directories": {
     "output": "release"
   },

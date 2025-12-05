@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gamesAPI } from '../../services/api';
+import './GameUpload.css';
 
 const GameUpload: React.FC = () => {
   const navigate = useNavigate();
@@ -77,83 +78,39 @@ const GameUpload: React.FC = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#0f172a',
-      padding: '2rem'
-    }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <div className="upload-page">
+      <div className="upload-container">
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <button
-            onClick={() => navigate('/library')}
-            style={{
-              backgroundColor: 'transparent',
-              color: '#94a3b8',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              marginBottom: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}
-          >
+        <div className="upload-header">
+          <button onClick={() => navigate('/library')} className="back-button">
             ← Back to Library
           </button>
-          <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: 'bold' }}>
+          <h1 className="upload-title">
             Upload Game
           </h1>
-          <p style={{ color: '#94a3b8', marginTop: '0.5rem' }}>
+          <p className="upload-subtitle">
             Add a new game to your library
           </p>
         </div>
 
         {/* Form */}
-        <div style={{
-          backgroundColor: '#1e293b',
-          padding: '2rem',
-          borderRadius: '12px',
-          border: '1px solid #334155'
-        }}>
+        <div className="upload-form-card">
           {error && (
-            <div style={{
-              backgroundColor: '#fee2e2',
-              border: '1px solid #ef4444',
-              color: '#991b1b',
-              padding: '0.75rem',
-              borderRadius: '6px',
-              marginBottom: '1.5rem',
-              fontSize: '0.875rem'
-            }}>
+            <div className="upload-error">
               {error}
             </div>
           )}
 
           {success && (
-            <div style={{
-              backgroundColor: '#d1fae5',
-              border: '1px solid #10b981',
-              color: '#065f46',
-              padding: '0.75rem',
-              borderRadius: '6px',
-              marginBottom: '1.5rem',
-              fontSize: '0.875rem'
-            }}>
+            <div className="upload-success">
               Game uploaded successfully! Redirecting to library...
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             {/* Game Title */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{
-                color: '#e2e8f0',
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '600'
-              }}>
+            <div className="form-group">
+              <label className="form-label">
                 Game Title *
               </label>
               <input
@@ -164,28 +121,13 @@ const GameUpload: React.FC = () => {
                 placeholder="Enter game title"
                 required
                 disabled={uploading || success}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #334155',
-                  backgroundColor: '#0f172a',
-                  color: 'white',
-                  fontSize: '0.95rem',
-                  boxSizing: 'border-box'
-                }}
+                className="form-input"
               />
             </div>
 
             {/* Description */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{
-                color: '#e2e8f0',
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '600'
-              }}>
+            <div className="form-group">
+              <label className="form-label">
                 Description *
               </label>
               <textarea
@@ -196,31 +138,14 @@ const GameUpload: React.FC = () => {
                 required
                 disabled={uploading || success}
                 rows={4}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #334155',
-                  backgroundColor: '#0f172a',
-                  color: 'white',
-                  fontSize: '0.95rem',
-                  boxSizing: 'border-box',
-                  fontFamily: 'inherit',
-                  resize: 'vertical'
-                }}
+                className="form-textarea"
               />
             </div>
 
             {/* Developer and Publisher */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div>
-                <label style={{
-                  color: '#e2e8f0',
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '600'
-                }}>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">
                   Developer *
                 </label>
                 <input
@@ -231,26 +156,11 @@ const GameUpload: React.FC = () => {
                   placeholder="Developer name"
                   required
                   disabled={uploading || success}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    borderRadius: '6px',
-                    border: '1px solid #334155',
-                    backgroundColor: '#0f172a',
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    boxSizing: 'border-box'
-                  }}
+                  className="form-input"
                 />
               </div>
-              <div>
-                <label style={{
-                  color: '#e2e8f0',
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '600'
-                }}>
+              <div className="form-group">
+                <label className="form-label">
                   Publisher *
                 </label>
                 <input
@@ -261,30 +171,15 @@ const GameUpload: React.FC = () => {
                   placeholder="Publisher name"
                   required
                   disabled={uploading || success}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    borderRadius: '6px',
-                    border: '1px solid #334155',
-                    backgroundColor: '#0f172a',
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    boxSizing: 'border-box'
-                  }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             {/* Genre and Platform */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div>
-                <label style={{
-                  color: '#e2e8f0',
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '600'
-                }}>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">
                   Genre
                 </label>
                 <input
@@ -294,26 +189,11 @@ const GameUpload: React.FC = () => {
                   onChange={handleChange}
                   placeholder="e.g., Action, RPG"
                   disabled={uploading || success}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    borderRadius: '6px',
-                    border: '1px solid #334155',
-                    backgroundColor: '#0f172a',
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    boxSizing: 'border-box'
-                  }}
+                  className="form-input"
                 />
               </div>
-              <div>
-                <label style={{
-                  color: '#e2e8f0',
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '600'
-                }}>
+              <div className="form-group">
+                <label className="form-label">
                   Platform
                 </label>
                 <input
@@ -323,30 +203,15 @@ const GameUpload: React.FC = () => {
                   onChange={handleChange}
                   placeholder="e.g., PC, Mac"
                   disabled={uploading || success}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    borderRadius: '6px',
-                    border: '1px solid #334155',
-                    backgroundColor: '#0f172a',
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    boxSizing: 'border-box'
-                  }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             {/* Price and Release Date */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div>
-                <label style={{
-                  color: '#e2e8f0',
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '600'
-                }}>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">
                   Price ($)
                 </label>
                 <input
@@ -358,26 +223,11 @@ const GameUpload: React.FC = () => {
                   step="0.01"
                   min="0"
                   disabled={uploading || success}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    borderRadius: '6px',
-                    border: '1px solid #334155',
-                    backgroundColor: '#0f172a',
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    boxSizing: 'border-box'
-                  }}
+                  className="form-input"
                 />
               </div>
-              <div>
-                <label style={{
-                  color: '#e2e8f0',
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: '600'
-                }}>
+              <div className="form-group">
+                <label className="form-label">
                   Release Date
                 </label>
                 <input
@@ -386,29 +236,14 @@ const GameUpload: React.FC = () => {
                   value={formData.releaseDate}
                   onChange={handleChange}
                   disabled={uploading || success}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    borderRadius: '6px',
-                    border: '1px solid #334155',
-                    backgroundColor: '#0f172a',
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    boxSizing: 'border-box'
-                  }}
+                  className="form-input"
                 />
               </div>
             </div>
 
             {/* File Uploads */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{
-                color: '#e2e8f0',
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '600'
-              }}>
+            <div className="form-group">
+              <label className="form-label">
                 Game File
               </label>
               <input
@@ -416,32 +251,17 @@ const GameUpload: React.FC = () => {
                 name="gameFile"
                 onChange={handleFileChange}
                 disabled={uploading || success}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #334155',
-                  backgroundColor: '#0f172a',
-                  color: 'white',
-                  fontSize: '0.95rem',
-                  boxSizing: 'border-box'
-                }}
+                className="form-file-input"
               />
               {gameFile && (
-                <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                <p className="form-file-note">
                   Selected: {gameFile.name}
                 </p>
               )}
             </div>
 
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{
-                color: '#e2e8f0',
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: '600'
-              }}>
+            <div className="form-group">
+              <label className="form-label">
                 Cover Image
               </label>
               <input
@@ -450,19 +270,10 @@ const GameUpload: React.FC = () => {
                 accept="image/*"
                 onChange={handleFileChange}
                 disabled={uploading || success}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #334155',
-                  backgroundColor: '#0f172a',
-                  color: 'white',
-                  fontSize: '0.95rem',
-                  boxSizing: 'border-box'
-                }}
+                className="form-file-input"
               />
               {coverImage && (
-                <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                <p className="form-file-note">
                   Selected: {coverImage.name}
                 </p>
               )}
@@ -472,25 +283,7 @@ const GameUpload: React.FC = () => {
             <button
               type="submit"
               disabled={uploading || success}
-              style={{
-                width: '100%',
-                padding: '1rem',
-                backgroundColor: (uploading || success) ? '#1e40af' : '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: (uploading || success) ? 'not-allowed' : 'pointer',
-                fontSize: '1rem',
-                fontWeight: '600',
-                transition: 'background-color 0.2s',
-                opacity: (uploading || success) ? 0.7 : 1
-              }}
-              onMouseOver={(e) => {
-                if (!uploading && !success) e.currentTarget.style.backgroundColor = '#2563eb';
-              }}
-              onMouseOut={(e) => {
-                if (!uploading && !success) e.currentTarget.style.backgroundColor = '#3b82f6';
-              }}
+              className="upload-submit-button"
             >
               {uploading ? 'Uploading...' : success ? 'Success!' : 'Upload Game'}
             </button>

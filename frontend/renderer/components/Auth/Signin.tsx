@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authAPI, handleApiError } from '../../services/api';
 import { UserLogin } from '../../types';
+import './Signin.css';
 
 interface SignInProps {
   onSignIn: () => void;
@@ -43,59 +44,26 @@ const SignIn: React.FC<SignInProps> = ({ onSignIn }) => {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      backgroundColor: '#0f172a',
-      backgroundImage: 'linear-gradient(to bottom right, #1e293b, #0f172a)'
-    }}>
-      <div style={{
-        backgroundColor: '#1e293b',
-        padding: '2.5rem',
-        borderRadius: '12px',
-        width: '100%',
-        maxWidth: '420px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{
-            color: 'white',
-            fontSize: '2rem',
-            fontWeight: 'bold',
-            marginBottom: '0.5rem'
-          }}>
+    <div className="signin-container">
+      <div className="signin-card">
+        <div className="signin-header">
+          <h2 className="signin-title">
             Welcome Back
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
+          <p className="signin-subtitle">
             Sign in to access your game library
           </p>
         </div>
 
         {error && (
-          <div style={{
-            backgroundColor: '#fee2e2',
-            border: '1px solid #ef4444',
-            color: '#991b1b',
-            padding: '0.75rem',
-            borderRadius: '6px',
-            marginBottom: '1.5rem',
-            fontSize: '0.875rem'
-          }}>
+          <div className="signin-error">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              color: '#e2e8f0',
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
+          <div className="form-group">
+            <label className="form-label">
               Email Address
             </label>
             <input
@@ -104,29 +72,14 @@ const SignIn: React.FC<SignInProps> = ({ onSignIn }) => {
               value={formData.email}
               onChange={handleChange}
               placeholder="you@example.com"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box'
-              }}
+              className="form-input"
               required
               disabled={loading}
             />
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{
-              color: '#e2e8f0',
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
+          <div className="form-group">
+            <label className="form-label">
               Password
             </label>
             <input
@@ -135,16 +88,7 @@ const SignIn: React.FC<SignInProps> = ({ onSignIn }) => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Enter your password"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box'
-              }}
+              className="form-input"
               required
               disabled={loading}
             />
@@ -153,45 +97,15 @@ const SignIn: React.FC<SignInProps> = ({ onSignIn }) => {
           <button
             type="submit"
             disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.875rem',
-              backgroundColor: loading ? '#1e40af' : '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontSize: '1rem',
-              fontWeight: '600',
-              transition: 'background-color 0.2s',
-              opacity: loading ? 0.7 : 1
-            }}
-            onMouseOver={(e) => {
-              if (!loading) e.currentTarget.style.backgroundColor = '#2563eb';
-            }}
-            onMouseOut={(e) => {
-              if (!loading) e.currentTarget.style.backgroundColor = '#3b82f6';
-            }}
+            className="submit-button"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <div style={{
-          marginTop: '1.5rem',
-          textAlign: 'center',
-          color: '#94a3b8',
-          fontSize: '0.875rem'
-        }}>
+        <div className="signin-footer">
           Don't have an account?{' '}
-          <Link
-            to="/signup"
-            style={{
-              color: '#3b82f6',
-              textDecoration: 'none',
-              fontWeight: '600'
-            }}
-          >
+          <Link to="/signup" className="signin-link">
             Sign Up
           </Link>
         </div>

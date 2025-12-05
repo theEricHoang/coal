@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI, handleApiError } from '../../services/api';
 import { UserCreate } from '../../types';
+import './SignUp.css';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -73,74 +74,32 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      backgroundColor: '#0f172a',
-      backgroundImage: 'linear-gradient(to bottom right, #1e293b, #0f172a)',
-      padding: '2rem 1rem'
-    }}>
-      <div style={{
-        backgroundColor: '#1e293b',
-        padding: '2.5rem',
-        borderRadius: '12px',
-        width: '100%',
-        maxWidth: '480px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{
-            color: 'white',
-            fontSize: '2rem',
-            fontWeight: 'bold',
-            marginBottom: '0.5rem'
-          }}>
+    <div className="signup-container">
+      <div className="signup-card">
+        <div className="signup-header">
+          <h2 className="signup-title">
             Create Account
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
+          <p className="signup-subtitle">
             Join our gaming community today
           </p>
         </div>
 
         {error && (
-          <div style={{
-            backgroundColor: '#fee2e2',
-            border: '1px solid #ef4444',
-            color: '#991b1b',
-            padding: '0.75rem',
-            borderRadius: '6px',
-            marginBottom: '1.5rem',
-            fontSize: '0.875rem'
-          }}>
+          <div className="signup-error">
             {error}
           </div>
         )}
 
         {success && (
-          <div style={{
-            backgroundColor: '#d1fae5',
-            border: '1px solid #10b981',
-            color: '#065f46',
-            padding: '0.75rem',
-            borderRadius: '6px',
-            marginBottom: '1.5rem',
-            fontSize: '0.875rem'
-          }}>
+          <div className="signup-success">
             Account created successfully! Redirecting to sign in...
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              color: '#e2e8f0',
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
+          <div className="form-group">
+            <label className="form-label">
               Username
             </label>
             <input
@@ -149,29 +108,14 @@ const SignUp: React.FC = () => {
               value={formData.username}
               onChange={handleChange}
               placeholder="Choose a username"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box'
-              }}
+              className="form-input"
               required
               disabled={loading || success}
             />
           </div>
 
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              color: '#e2e8f0',
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
+          <div className="form-group">
+            <label className="form-label">
               Email Address
             </label>
             <input
@@ -180,45 +124,21 @@ const SignUp: React.FC = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="you@example.com"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box'
-              }}
+              className="form-input"
               required
               disabled={loading || success}
             />
           </div>
 
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              color: '#e2e8f0',
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
+          <div className="form-group">
+            <label className="form-label">
               Account Type
             </label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box'
-              }}
+              className="form-select"
               disabled={loading || success}
             >
               <option value="user">User (Player)</option>
@@ -226,14 +146,8 @@ const SignUp: React.FC = () => {
             </select>
           </div>
 
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              color: '#e2e8f0',
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
+          <div className="form-group">
+            <label className="form-label">
               Password
             </label>
             <input
@@ -242,29 +156,14 @@ const SignUp: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Create a password (min. 6 characters)"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box'
-              }}
+              className="form-input"
               required
               disabled={loading || success}
             />
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{
-              color: '#e2e8f0',
-              display: 'block',
-              marginBottom: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
+          <div className="form-group">
+            <label className="form-label">
               Confirm Password
             </label>
             <input
@@ -273,16 +172,7 @@ const SignUp: React.FC = () => {
               value={confirmPassword}
               onChange={handleChange}
               placeholder="Re-enter your password"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box'
-              }}
+              className="form-input"
               required
               disabled={loading || success}
             />
@@ -291,45 +181,15 @@ const SignUp: React.FC = () => {
           <button
             type="submit"
             disabled={loading || success}
-            style={{
-              width: '100%',
-              padding: '0.875rem',
-              backgroundColor: (loading || success) ? '#1e40af' : '#3b82f6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: (loading || success) ? 'not-allowed' : 'pointer',
-              fontSize: '1rem',
-              fontWeight: '600',
-              transition: 'background-color 0.2s',
-              opacity: (loading || success) ? 0.7 : 1
-            }}
-            onMouseOver={(e) => {
-              if (!loading && !success) e.currentTarget.style.backgroundColor = '#2563eb';
-            }}
-            onMouseOut={(e) => {
-              if (!loading && !success) e.currentTarget.style.backgroundColor = '#3b82f6';
-            }}
+            className="submit-button"
           >
             {loading ? 'Creating Account...' : success ? 'Success!' : 'Sign Up'}
           </button>
         </form>
 
-        <div style={{
-          marginTop: '1.5rem',
-          textAlign: 'center',
-          color: '#94a3b8',
-          fontSize: '0.875rem'
-        }}>
+        <div className="signup-footer">
           Already have an account?{' '}
-          <Link
-            to="/signin"
-            style={{
-              color: '#3b82f6',
-              textDecoration: 'none',
-              fontWeight: '600'
-            }}
-          >
+          <Link to="/signin" className="signup-link">
             Sign In
           </Link>
         </div>

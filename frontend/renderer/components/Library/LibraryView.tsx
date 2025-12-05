@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userAPI, authAPI } from '../../services/api';
 import { UserLibraryItem } from '../../types';
+import './LibraryView.css';
 
 const LibraryView: React.FC = () => {
   const navigate = useNavigate();
@@ -51,76 +52,38 @@ const LibraryView: React.FC = () => {
   const totalHoursPlayed = games.reduce((sum, game) => sum + game.hours_played, 0);
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0f172a', paddingTop: '1rem' }}>
+    <div className="library-page">
       {/* Header Section */}
-      <div style={{
-        backgroundColor: '#1e293b',
-        padding: '2rem',
-        marginBottom: '2rem',
-        borderBottom: '1px solid #334155'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div>
-              <h1 style={{ color: 'white', fontSize: '2.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+      <div className="library-header">
+        <div className="library-header-content">
+          <div className="library-header-top">
+            <div className="library-title-section">
+              <h1>
                 My Library
               </h1>
-              <p style={{ color: '#94a3b8', fontSize: '1rem' }}>
+              <p>
                 {games.length} {games.length === 1 ? 'game' : 'games'} • {totalHoursPlayed.toFixed(1)} hours played
               </p>
             </div>
-            <button
-              onClick={() => navigate('/upload')}
-              style={{
-                backgroundColor: '#3b82f6',
-                color: 'white',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '8px',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
-            >
-              <span style={{ fontSize: '1.2rem' }}>+</span>
+            <button onClick={() => navigate('/upload')} className="upload-game-btn">
+              <span className="upload-game-btn-icon">+</span>
               Upload Game
             </button>
           </div>
 
           {/* Search and Filter */}
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="library-filters">
             <input
               type="text"
               placeholder="Search your library..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                flex: 1,
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem'
-              }}
+              className="library-search"
             />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              style={{
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
-                border: '1px solid #334155',
-                backgroundColor: '#0f172a',
-                color: 'white',
-                fontSize: '0.95rem',
-                cursor: 'pointer'
-              }}
+              className="library-sort"
             >
               <option value="title">Sort by Title</option>
               <option value="hours">Sort by Hours Played</option>
@@ -131,175 +94,73 @@ const LibraryView: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem 2rem' }}>
+      <div className="library-content">
         {loading ? (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '400px',
-            color: '#94a3b8',
-            fontSize: '1.2rem'
-          }}>
+          <div className="library-loading">
             Loading your library...
           </div>
         ) : error ? (
-          <div style={{
-            backgroundColor: '#fee2e2',
-            border: '1px solid #ef4444',
-            color: '#991b1b',
-            padding: '1rem',
-            borderRadius: '8px',
-            textAlign: 'center'
-          }}>
+          <div className="library-error">
             {error}
-            <button
-              onClick={loadLibrary}
-              style={{
-                marginTop: '1rem',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#ef4444',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
+            <button onClick={loadLibrary} className="library-retry-btn">
               Retry
             </button>
           </div>
         ) : filteredAndSortedGames.length === 0 ? (
-          <div style={{
-            textAlign: 'center',
-            padding: '4rem 2rem',
-            color: '#94a3b8'
-          }}>
-            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📚</div>
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: 'white' }}>
+          <div className="library-empty">
+            <div className="library-empty-icon">📚</div>
+            <h2>
               {searchQuery ? 'No games found' : 'Your library is empty'}
             </h2>
-            <p style={{ marginBottom: '1.5rem' }}>
+            <p>
               {searchQuery ? 'Try a different search term' : 'Start building your collection!'}
             </p>
             {!searchQuery && (
-              <button
-                onClick={() => navigate('/upload')}
-                style={{
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  fontWeight: '600'
-                }}
-              >
+              <button onClick={() => navigate('/upload')} className="library-empty-btn">
                 Upload Your First Game
               </button>
             )}
           </div>
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '1.5rem'
-          }}>
+          <div className="library-grid">
             {filteredAndSortedGames.map((game) => (
-              <div
-                key={game.ownership_id}
-                style={{
-                  backgroundColor: '#1e293b',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  border: '1px solid #334155',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  cursor: 'pointer'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.5)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
+              <div key={game.ownership_id} className="game-card">
                 {/* Game Cover Placeholder */}
-                <div style={{
-                  height: '180px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative'
-                }}>
-                  <span style={{ fontSize: '3rem' }}>🎮</span>
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '0.5rem',
-                    right: '0.5rem',
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                    color: 'white',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '4px',
-                    fontSize: '0.75rem'
-                  }}>
+                <div className="game-card-cover">
+                  <span className="game-card-cover-icon">🎮</span>
+                  <div className="game-card-hours">
                     {game.hours_played}h
                   </div>
                 </div>
 
                 {/* Game Info */}
-                <div style={{ padding: '1rem' }}>
-                  <h3 style={{
-                    color: 'white',
-                    fontSize: '1.1rem',
-                    marginBottom: '0.5rem',
-                    fontWeight: '600',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}>
+                <div className="game-card-info">
+                  <h3 className="game-card-title">
                     {game.title}
                   </h3>
                   
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div className="game-card-details">
                     {game.genre && (
-                      <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
+                      <div className="game-card-detail">
                         🎯 {game.genre}
                       </div>
                     )}
                     {game.platform && (
-                      <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
+                      <div className="game-card-detail">
                         💻 {game.platform}
                       </div>
                     )}
-                    <div style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
+                    <div className="game-card-detail">
                       📅 Added {new Date(game.date_purchased).toLocaleDateString()}
                     </div>
                     {game.price && (
-                      <div style={{
-                        color: '#10b981',
-                        fontSize: '0.875rem',
-                        fontWeight: '600',
-                        marginTop: '0.25rem'
-                      }}>
+                      <div className="game-card-price">
                         ${game.price.toFixed(2)}
                       </div>
                     )}
                   </div>
 
-                  <div style={{
-                    marginTop: '0.75rem',
-                    padding: '0.5rem',
-                    backgroundColor: game.status === 'installed' ? '#065f46' : '#1e40af',
-                    color: 'white',
-                    borderRadius: '6px',
-                    textAlign: 'center',
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    textTransform: 'capitalize'
-                  }}>
+                  <div className={`game-card-status ${game.status === 'installed' ? 'installed' : 'not-installed'}`}>
                     {game.status}
                   </div>
                 </div>
