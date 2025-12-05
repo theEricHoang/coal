@@ -78,7 +78,7 @@ def create_review(review: ReviewCreate, db=Depends(get_db)):
         )
         
         # Fetch full details for response
-        full_review = review_dao.get_by_id(created_review['review_id'])
+        full_review = review_dao.get_by_id(created_review['review_id']) # type: ignore
         return full_review
     except ValueError as e:
         raise HTTPException(

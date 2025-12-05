@@ -3,10 +3,12 @@ Game API Handlers
 Endpoints for game catalog, search, and game-specific operations
 """
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, status, Depends, Query
+from fastapi import APIRouter, HTTPException, status, Depends, Query, UploadFile, File
 from pydantic import BaseModel
 from datetime import date, datetime
 import psycopg2
+import os
+import uuid
 from dao import GameDAO, ReviewDAO, UserGameDAO
 from database import get_db
 
@@ -48,6 +50,7 @@ class GameResponse(BaseModel):
     tags: Optional[List[str]]
     description: Optional[str]
     price: Optional[float]
+    thumbnail: Optional[str]
     studio_id: Optional[int]
     created_at: datetime
     updated_at: datetime
@@ -63,6 +66,7 @@ class GameDetail(BaseModel):
     tags: Optional[List[str]]
     description: Optional[str]
     price: Optional[float]
+    thumbnail: Optional[str]
     studio_id: Optional[int]
     average_rating: Optional[float]
     total_reviews: int
@@ -247,6 +251,50 @@ def update_game(game_id: int, game_update: GameUpdate, db=Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update game"
+        )
+
+
+@router.post("/{game_id}/upload-thumbnail")
+async def upload_game_thumbnail(game_id: int, file: UploadFile = File(...), db=Depends(get_db)):
+    """Upload thumbnail image for game"""
+    game_dao = GameDAO(db)
+    
+    if not game_dao.get_by_id(game_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Game not found"
+        )
+    
+    # Validate file type
+    if not file.content_type or not file.content_type.startswith('image/'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be an image"
+        )
+    
+    # Generate unique filename
+    file_ext = os.path.splitext(file.filename or 'image.jpg')[1]
+    unique_filename = f"{uuid.uuid4()}{file_ext}"
+    file_path = f"static/images/{unique_filename}"
+    
+    # Save file
+    try:
+        with open(file_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+        
+        # Update game record with image path
+        db_path = f"images/{unique_filename}"
+        game_dao.update(game_id, thumbnail=db_path)
+        
+        return {
+            "message": "Thumbnail uploaded successfully",
+            "thumbnail": f"http://localhost:8000/static/{db_path}"
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload thumbnail"
         )
 
 

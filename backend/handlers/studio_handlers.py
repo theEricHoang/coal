@@ -3,10 +3,12 @@ Studio API Handlers
 Endpoints for game studio information and their published games
 """
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, status, Depends, Query
+from fastapi import APIRouter, HTTPException, status, Depends, Query, UploadFile, File
 from pydantic import BaseModel
 from datetime import datetime
 import psycopg2
+import os
+import uuid
 from dao import StudioDAO, GameDAO
 from database import get_db
 
@@ -167,6 +169,50 @@ def update_studio(studio_id: int, studio_update: StudioUpdate, db=Depends(get_db
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update studio"
+        )
+
+
+@router.post("/{studio_id}/upload-logo")
+async def upload_studio_logo(studio_id: int, file: UploadFile = File(...), db=Depends(get_db)):
+    """Upload logo for studio"""
+    studio_dao = StudioDAO(db)
+    
+    if not studio_dao.get_by_id(studio_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Studio not found"
+        )
+    
+    # Validate file type
+    if not file.content_type or not file.content_type.startswith('image/'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be an image"
+        )
+    
+    # Generate unique filename
+    file_ext = os.path.splitext(file.filename or 'image.jpg')[1]
+    unique_filename = f"{uuid.uuid4()}{file_ext}"
+    file_path = f"static/images/{unique_filename}"
+    
+    # Save file
+    try:
+        with open(file_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+        
+        # Update studio record with image path
+        db_path = f"images/{unique_filename}"
+        studio_dao.update(studio_id, logo=db_path)
+        
+        return {
+            "message": "Logo uploaded successfully",
+            "logo": f"http://localhost:8000/static/{db_path}"
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload logo"
         )
 
 

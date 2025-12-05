@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from database import db_pool
 from handlers import (
     user_router,
@@ -32,6 +33,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Mount static files directory
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Register routers
 app.include_router(user_router)

@@ -3,10 +3,12 @@ User API Handlers
 Endpoints for user management, authentication, and user-specific operations
 """
 from typing import Optional
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, UploadFile, File
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 import psycopg2
+import os
+import uuid
 from dao import UserDAO, UserGameDAO, ReviewDAO
 from database import get_db
 from auth import hash_password, verify_password
@@ -19,7 +21,7 @@ class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
-    role: Optional[str] = "user"
+    role: str = "user"
 
 
 class UserUpdate(BaseModel):
@@ -34,6 +36,7 @@ class UserResponse(BaseModel):
     username: str
     email: str
     role: str
+    profile_picture: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -70,6 +73,7 @@ class LoginResponse(BaseModel):
     username: str
     email: str
     role: str
+    profile_picture: Optional[str] = None
     message: str
 
 
@@ -94,11 +98,15 @@ def login_user(credentials: UserLogin, db=Depends(get_db)):
         )
     
     # Return user info (without password)
+    profile_pic = user.get('profile_picture')
+    profile_url = f"http://localhost:8000/static/{profile_pic}" if profile_pic else None
+    
     return {
         "user_id": user['user_id'],
         "username": user['username'],
         "email": user['email'],
         "role": user['role'],
+        "profile_picture": profile_url,
         "message": "Login successful"
     }
 
@@ -267,6 +275,50 @@ def update_user(user_id: int, user_update: UserUpdate, db=Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update user"
+        )
+
+
+@router.post("/{user_id}/upload-profile-picture")
+async def upload_profile_picture(user_id: int, file: UploadFile = File(...), db=Depends(get_db)):
+    """Upload profile picture for user"""
+    user_dao = UserDAO(db)
+    
+    if not user_dao.get_by_id(user_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Validate file type
+    if not file.content_type or not file.content_type.startswith('image/'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be an image"
+        )
+    
+    # Generate unique filename
+    file_ext = os.path.splitext(file.filename or 'image.jpg')[1]
+    unique_filename = f"{uuid.uuid4()}{file_ext}"
+    file_path = f"static/images/{unique_filename}"
+    
+    # Save file
+    try:
+        with open(file_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+        
+        # Update user record with image path
+        db_path = f"images/{unique_filename}"
+        user_dao.update(user_id, profile_picture=db_path)
+        
+        return {
+            "message": "Profile picture uploaded successfully",
+            "profile_picture": f"http://localhost:8000/static/{db_path}"
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload profile picture"
         )
 
 
