@@ -20,6 +20,7 @@ class StudioCreate(BaseModel):
     name: str
     logo: Optional[str] = None
     contact_info: Optional[str] = None
+    user_id: Optional[int] = None
 
 
 class StudioUpdate(BaseModel):
@@ -33,6 +34,7 @@ class StudioResponse(BaseModel):
     name: str
     logo: Optional[str]
     contact_info: Optional[str]
+    user_id: Optional[int]
     created_at: datetime
     updated_at: datetime
 
@@ -42,6 +44,7 @@ class StudioDetail(BaseModel):
     name: str
     logo: Optional[str]
     contact_info: Optional[str]
+    user_id: Optional[int]
     total_games: int
     created_at: datetime
     updated_at: datetime
@@ -73,7 +76,8 @@ def create_studio(studio: StudioCreate, db=Depends(get_db)):
         created_studio = studio_dao.create(
             name=studio.name,
             logo=studio.logo,
-            contact_info=studio.contact_info
+            contact_info=studio.contact_info,
+            user_id=studio.user_id
         )
         return created_studio
     except psycopg2.Error as e:

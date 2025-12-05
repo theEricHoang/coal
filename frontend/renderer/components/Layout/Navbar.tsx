@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { authAPI } from '../../services/api';
+import { authAPI, userAPI } from '../../services/api';
 import './Navbar.css';
 import coal_logo from '../../assets/coal_logo.png';
 import monk_pfp from '../../assets/monk_pfp.png';
@@ -13,6 +13,25 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const location = useLocation();
   const username = localStorage.getItem('username') || 'User';
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string>(monk_pfp);
+
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      const userId = authAPI.getCurrentUserId();
+      if (userId) {
+        try {
+          const user = await userAPI.getUser(userId);
+          if (user.profile_picture) {
+            setProfilePicture(user.profile_picture);
+          }
+        } catch (error) {
+          console.error('Failed to load user profile:', error);
+        }
+      }
+    };
+
+    loadUserProfile();
+  }, []);
 
   const handleLogout = () => {
     authAPI.logout();
@@ -38,16 +57,16 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           {/* Navigation Links */}
           <div className="navbar-nav">
             <Link
+              to="/store"
+              className={`navbar-link ${isActive('/store') ? 'active' : ''}`}
+            >
+              store
+            </Link>
+            <Link
               to="/library"
               className={`navbar-link ${isActive('/library') ? 'active' : ''}`}
             >
               library
-            </Link>
-            <Link
-              to="/upload"
-              className={`navbar-link ${isActive('/upload') ? 'active' : ''}`}
-            >
-              upload
             </Link>
           </div>
         </div>
@@ -77,7 +96,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
             
             {/* Profile Picture */}
             <div className="navbar-user-pfp-container">
-              <img src={monk_pfp} alt="Profile" className="navbar-user-pfp" />
+              <img src={profilePicture} alt="Profile" className="navbar-user-pfp" />
             </div>
           </div>
           

@@ -29,7 +29,7 @@ class UserDAO:
     def get_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
         """Get a user by ID"""
         query = """
-            SELECT user_id, username, email, role, created_at, updated_at
+            SELECT user_id, username, email, role, profile_picture, created_at, updated_at
             FROM users
             WHERE user_id = %s
         """

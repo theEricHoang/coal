@@ -27,7 +27,7 @@ class GameDAO:
         query = """
             INSERT INTO games (title, genre, developer, release_date, platform, tags, description, price, studio_id)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING game_id, title, genre, developer, release_date, platform, tags, description, price, studio_id, created_at, updated_at
+            RETURNING game_id, title, genre, developer, release_date, platform, tags, description, price, thumbnail, studio_id, created_at, updated_at
         """
         try:
             with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -42,7 +42,7 @@ class GameDAO:
         """Get a game by ID"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
-                   tags, description, price, studio_id, created_at, updated_at
+                   tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
             WHERE game_id = %s
         """
@@ -55,7 +55,7 @@ class GameDAO:
         """Get a game by title"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
-                   tags, description, price, studio_id, created_at, updated_at
+                   tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
             WHERE title = %s
         """
@@ -68,7 +68,7 @@ class GameDAO:
         """Get all games with pagination"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
-                   tags, description, price, studio_id, created_at, updated_at
+                   tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
             ORDER BY created_at DESC
             LIMIT %s OFFSET %s
@@ -81,7 +81,7 @@ class GameDAO:
         """Search games by title (case-insensitive partial match)"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
-                   tags, description, price, studio_id, created_at, updated_at
+                   tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
             WHERE title ILIKE %s
             ORDER BY title
@@ -95,7 +95,7 @@ class GameDAO:
         """Get games by genre"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
-                   tags, description, price, studio_id, created_at, updated_at
+                   tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
             WHERE genre ILIKE %s
             ORDER BY title
@@ -109,7 +109,7 @@ class GameDAO:
         """Get games by platform"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
-                   tags, description, price, studio_id, created_at, updated_at
+                   tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
             WHERE platform ILIKE %s
             ORDER BY title
@@ -123,7 +123,7 @@ class GameDAO:
         """Get games by studio ID"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
-                   tags, description, price, studio_id, created_at, updated_at
+                   tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
             WHERE studio_id = %s
             ORDER BY release_date DESC
@@ -135,7 +135,7 @@ class GameDAO:
 
     def update(self, game_id: int, **kwargs) -> Optional[Dict[str, Any]]:
         """Update a game by ID"""
-        allowed_fields = ['title', 'genre', 'developer', 'release_date', 'platform', 'tags', 'description', 'price', 'studio_id']
+        allowed_fields = ['title', 'genre', 'developer', 'release_date', 'platform', 'tags', 'description', 'price', 'thumbnail', 'studio_id']
         updates = {k: v for k, v in kwargs.items() if k in allowed_fields and v is not None}
         
         if not updates:
@@ -146,7 +146,7 @@ class GameDAO:
             UPDATE games
             SET {set_clause}
             WHERE game_id = %s
-            RETURNING game_id, title, genre, developer, release_date, platform, tags, description, price, studio_id, created_at, updated_at
+            RETURNING game_id, title, genre, developer, release_date, platform, tags, description, price, thumbnail, studio_id, created_at, updated_at
         """
         
         try:

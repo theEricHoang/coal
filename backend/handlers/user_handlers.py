@@ -48,6 +48,7 @@ class UserLibraryItem(BaseModel):
     genre: Optional[str]
     platform: Optional[str]
     price: Optional[float]
+    thumbnail: Optional[str]
     hours_played: float
     status: str
     date_purchased: datetime
@@ -158,6 +159,10 @@ def get_user(user_id: int, db=Depends(get_db)):
             detail="User not found"
         )
     
+    # Convert profile picture path to full URL
+    if user.get('profile_picture'):
+        user['profile_picture'] = f"http://localhost:8000/static/{user['profile_picture']}"
+    
     return user
 
 
@@ -208,6 +213,11 @@ def get_user_library(
         games = user_game_dao.get_by_status(user_id, status_filter)
     else:
         games = user_game_dao.get_by_user(user_id, limit, offset)
+    
+    # Convert thumbnail paths to full URLs
+    for game in games:
+        if game.get('thumbnail'):
+            game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
     
     return games
 

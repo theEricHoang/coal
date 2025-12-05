@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userAPI, authAPI } from '../../services/api';
 import { UserLibraryItem } from '../../types';
+import AddGameModal from './AddGameModal';
 import './LibraryView.css';
 
 const LibraryView: React.FC = () => {
@@ -9,8 +10,7 @@ const LibraryView: React.FC = () => {
   const [games, setGames] = useState<UserLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'title' | 'hours' | 'recent'>('title');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     loadLibrary();
@@ -37,138 +37,123 @@ const LibraryView: React.FC = () => {
     }
   };
 
-  const filteredAndSortedGames = games
-    .filter(game => 
-      game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (game.genre && game.genre.toLowerCase().includes(searchQuery.toLowerCase()))
-    )
-    .sort((a, b) => {
-      if (sortBy === 'title') return a.title.localeCompare(b.title);
-      if (sortBy === 'hours') return b.hours_played - a.hours_played;
-      if (sortBy === 'recent') return new Date(b.date_purchased).getTime() - new Date(a.date_purchased).getTime();
-      return 0;
-    });
+  if (loading) {
+    return (
+      <div className="library-page">
+        <div className="library-loading">loading...</div>
+      </div>
+    );
+  }
 
-  const totalHoursPlayed = games.reduce((sum, game) => sum + game.hours_played, 0);
+  if (error) {
+    return (
+      <div className="library-page">
+        <div className="library-error">{error}</div>
+      </div>
+    );
+  }
+
+  if (games.length === 0) {
+    return (
+      <div className="library-page">
+        <div className="library-empty">no games added</div>
+        <button className="library-fab" onClick={() => setIsModalOpen(true)}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <AddGameModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onGameAdded={loadLibrary}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="library-page">
-      {/* Header Section */}
-      <div className="library-header">
-        <div className="library-header-content">
-          <div className="library-header-top">
-            <div className="library-title-section">
-              <h1>
-                My Library
-              </h1>
-              <p>
-                {games.length} {games.length === 1 ? 'game' : 'games'} • {totalHoursPlayed.toFixed(1)} hours played
-              </p>
-            </div>
-            <button onClick={() => navigate('/upload')} className="upload-game-btn">
-              <span className="upload-game-btn-icon">+</span>
-              Upload Game
-            </button>
-          </div>
-
-          {/* Search and Filter */}
-          <div className="library-filters">
-            <input
-              type="text"
-              placeholder="Search your library..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="library-search"
-            />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="library-sort"
-            >
-              <option value="title">Sort by Title</option>
-              <option value="hours">Sort by Hours Played</option>
-              <option value="recent">Sort by Recently Added</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="library-content">
-        {loading ? (
-          <div className="library-loading">
-            Loading your library...
-          </div>
-        ) : error ? (
-          <div className="library-error">
-            {error}
-            <button onClick={loadLibrary} className="library-retry-btn">
-              Retry
-            </button>
-          </div>
-        ) : filteredAndSortedGames.length === 0 ? (
-          <div className="library-empty">
-            <div className="library-empty-icon">📚</div>
-            <h2>
-              {searchQuery ? 'No games found' : 'Your library is empty'}
-            </h2>
-            <p>
-              {searchQuery ? 'Try a different search term' : 'Start building your collection!'}
-            </p>
-            {!searchQuery && (
-              <button onClick={() => navigate('/upload')} className="library-empty-btn">
-                Upload Your First Game
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="library-grid">
-            {filteredAndSortedGames.map((game) => (
-              <div key={game.ownership_id} className="game-card">
-                {/* Game Cover Placeholder */}
-                <div className="game-card-cover">
-                  <span className="game-card-cover-icon">🎮</span>
-                  <div className="game-card-hours">
-                    {game.hours_played}h
-                  </div>
+      <div className="library-grid">
+        {games.map((game) => (
+          <div key={game.ownership_id} className="library-item">
+            <div className="library-thumbnail">
+              {game.thumbnail ? (
+                <img src={game.thumbnail} alt={game.title} className="library-thumbnail-image" />
+              ) : (
+                <div className="library-thumbnail-placeholder">
+                  <span className="library-thumbnail-title">{game.title}</span>
                 </div>
-
-                {/* Game Info */}
-                <div className="game-card-info">
-                  <h3 className="game-card-title">
-                    {game.title}
-                  </h3>
-                  
-                  <div className="game-card-details">
-                    {game.genre && (
-                      <div className="game-card-detail">
-                        🎯 {game.genre}
-                      </div>
-                    )}
-                    {game.platform && (
-                      <div className="game-card-detail">
-                        💻 {game.platform}
-                      </div>
-                    )}
-                    <div className="game-card-detail">
-                      📅 Added {new Date(game.date_purchased).toLocaleDateString()}
-                    </div>
-                    {game.price && (
-                      <div className="game-card-price">
-                        ${game.price.toFixed(2)}
-                      </div>
-                    )}
+              )}
+            </div>
+            
+            <div className="library-hover-card">
+              <div className="library-hover-thumbnail">
+                {game.thumbnail ? (
+                  <img src={game.thumbnail} alt={game.title} className="library-thumbnail-image" />
+                ) : (
+                  <div className="library-thumbnail-placeholder">
+                    <span className="library-thumbnail-title">{game.title}</span>
                   </div>
-
-                  <div className={`game-card-status ${game.status === 'installed' ? 'installed' : 'not-installed'}`}>
-                    {game.status}
+                )}
+              </div>
+              
+              <div className="library-hover-info">
+                <h3 className="library-hover-title">{game.title}</h3>
+                
+                <div className="library-hover-details">
+                  {game.genre && (
+                    <div className="library-hover-detail">
+                      <span className="library-hover-label">genre</span>
+                      <span className="library-hover-value">{game.genre}</span>
+                    </div>
+                  )}
+                  
+                  {game.platform && (
+                    <div className="library-hover-detail">
+                      <span className="library-hover-label">platform</span>
+                      <span className="library-hover-value">{game.platform}</span>
+                    </div>
+                  )}
+                  
+                  <div className="library-hover-detail">
+                    <span className="library-hover-label">hours played</span>
+                    <span className="library-hover-value">{game.hours_played.toFixed(1)}h</span>
+                  </div>
+                  
+                  {game.price !== null && game.price !== undefined && (
+                    <div className="library-hover-detail">
+                      <span className="library-hover-label">price</span>
+                      <span className="library-hover-value">${game.price.toFixed(2)}</span>
+                    </div>
+                  )}
+                  
+                  <div className="library-hover-detail">
+                    <span className="library-hover-label">added</span>
+                    <span className="library-hover-value">{new Date(game.date_purchased).toLocaleDateString()}</span>
+                  </div>
+                  
+                  <div className="library-hover-detail">
+                    <span className="library-hover-label">status</span>
+                    <span className="library-hover-value">{game.status}</span>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        ))}
       </div>
+      
+      <button className="library-fab" onClick={() => setIsModalOpen(true)}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+      
+      <AddGameModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onGameAdded={loadLibrary}
+      />
     </div>
   );
 };

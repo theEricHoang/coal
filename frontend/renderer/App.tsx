@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import SignIn from './components/Auth/Signin';
 import SignUp from './components/Auth/SignUp';
 import LibraryView from './components/Library/LibraryView';
-import GameUpload from './components/Upload/GameUpload';
+import StoreView from './components/Store/StoreView';
 import Navbar from './components/Layout/Navbar';
 
 
@@ -42,9 +42,9 @@ const App: React.FC = () => {
           } 
         />
         <Route 
-          path="/upload" 
+          path="/store" 
           element={
-            isAuthenticated ? <GameUpload /> : <Navigate to="/signin" />
+            isAuthenticated ? <StoreView /> : <Navigate to="/signin" />
           } 
         />
         <Route path="/" element={<Navigate to="/library" />} />

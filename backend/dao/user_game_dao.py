@@ -25,6 +25,9 @@ class UserGameDAO:
         game_studio_id: Optional[int] = None
     ) -> Optional[Dict[str, Any]]:
         """Create a new user game ownership record"""
+        if date_purchased is None:
+            date_purchased = datetime.now()
+        
         query = """
             INSERT INTO user_games (user_id, game_id, type, options, date_purchased, hours_played, 
                                    status, loaned_to, loan_duration, game_studio_id)
@@ -74,7 +77,7 @@ class UserGameDAO:
             SELECT ug.ownership_id, ug.user_id, ug.game_id, ug.type, ug.options, ug.date_purchased, 
                    ug.hours_played, ug.status, ug.loaned_to, ug.loan_duration, ug.game_studio_id, 
                    ug.created_at, ug.updated_at,
-                   g.title, g.genre, g.platform, g.price
+                   g.title, g.genre, g.platform, g.price, g.thumbnail
             FROM user_games ug
             JOIN games g ON ug.game_id = g.game_id
             WHERE ug.user_id = %s
@@ -91,7 +94,7 @@ class UserGameDAO:
             SELECT ug.ownership_id, ug.user_id, ug.game_id, ug.type, ug.options, ug.date_purchased, 
                    ug.hours_played, ug.status, ug.loaned_to, ug.loan_duration, ug.game_studio_id, 
                    ug.created_at, ug.updated_at,
-                   g.title, g.genre, g.platform, g.price
+                   g.title, g.genre, g.platform, g.price, g.thumbnail
             FROM user_games ug
             JOIN games g ON ug.game_id = g.game_id
             WHERE ug.user_id = %s AND ug.status = %s
@@ -107,7 +110,7 @@ class UserGameDAO:
             SELECT ug.ownership_id, ug.user_id, ug.game_id, ug.type, ug.options, ug.date_purchased, 
                    ug.hours_played, ug.status, ug.loaned_to, ug.loan_duration, ug.game_studio_id, 
                    ug.created_at, ug.updated_at,
-                   g.title, u.username as loaned_to_username
+                   g.title, g.thumbnail, u.username as loaned_to_username
             FROM user_games ug
             JOIN games g ON ug.game_id = g.game_id
             LEFT JOIN users u ON ug.loaned_to = u.user_id

@@ -103,6 +103,11 @@ def get_user_library(
     else:
         games = user_game_dao.get_by_user(user_id, limit, offset)
     
+    # Convert thumbnail paths to full URLs
+    for game in games:
+        if game.get('thumbnail'):
+            game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
+    
     total_games = user_game_dao.count_by_user(user_id)
     
     return {

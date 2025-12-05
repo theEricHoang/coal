@@ -10,16 +10,16 @@ class StudioDAO:
     def __init__(self, connection):
         self.connection = connection
 
-    def create(self, name: str, logo: Optional[str] = None, contact_info: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    def create(self, name: str, logo: Optional[str] = None, contact_info: Optional[str] = None, user_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
         """Create a new studio"""
         query = """
-            INSERT INTO studios (name, logo, contact_info)
-            VALUES (%s, %s, %s)
-            RETURNING studio_id, name, logo, contact_info, created_at, updated_at
+            INSERT INTO studios (name, logo, contact_info, user_id)
+            VALUES (%s, %s, %s, %s)
+            RETURNING studio_id, name, logo, contact_info, user_id, created_at, updated_at
         """
         try:
             with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute(query, (name, logo, contact_info))
+                cursor.execute(query, (name, logo, contact_info, user_id))
                 self.connection.commit()
                 return dict(cursor.fetchone())
         except psycopg2.Error as e:

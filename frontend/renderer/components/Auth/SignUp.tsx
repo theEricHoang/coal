@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authAPI, handleApiError } from '../../services/api';
+import { authAPI, studioAPI, handleApiError } from '../../services/api';
 import { UserCreate } from '../../types';
 import './SignUp.css';
 import coal_logo from '../../assets/coal_logo.png';
@@ -13,14 +13,24 @@ const SignUp: React.FC = () => {
     password: '',
     role: 'user', // default role
   });
+  const [studioData, setStudioData] = useState({
+    studioName: '',
+    contactInfo: '',
+  });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     if (e.target.name === 'confirmPassword') {
       setConfirmPassword(e.target.value);
+    } else if (e.target.name === 'studioName' || e.target.name === 'contactInfo') {
+      setStudioData({
+        ...studioData,
+        [e.target.name]: e.target.value,
+      });
     } else {
       setFormData({
         ...formData,
@@ -28,6 +38,12 @@ const SignUp: React.FC = () => {
       });
     }
     if (error) setError('');
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setLogoFile(e.target.files[0]);
+    }
   };
 
   const validateForm = (): boolean => {
@@ -43,6 +59,16 @@ const SignUp: React.FC = () => {
       setError('Username is required');
       return false;
     }
+    if (formData.role === 'studio') {
+      if (!studioData.studioName.trim()) {
+        setError('Studio name is required');
+        return false;
+      }
+      if (!logoFile) {
+        setError('Studio logo is required');
+        return false;
+      }
+    }
     return true;
   };
 
@@ -57,8 +83,29 @@ const SignUp: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await authAPI.register(formData);
-      console.log('Registration successful:', response);
+      // Step 1: Create user account
+      const userResponse = await authAPI.register(formData);
+      console.log('User registration successful:', userResponse);
+
+      // If studio account, create studio and upload logos
+      if (formData.role === 'studio' && logoFile) {
+        // Step 2: Create studio record
+        const studioResponse = await studioAPI.createStudio({
+          name: studioData.studioName,
+          contact_info: studioData.contactInfo,
+          user_id: userResponse.user_id,
+        });
+        console.log('Studio creation successful:', studioResponse);
+
+        // Step 3: Upload logo as user profile picture
+        await studioAPI.uploadProfilePicture(userResponse.user_id, logoFile);
+        console.log('Profile picture uploaded');
+
+        // Step 4: Upload logo as studio logo
+        await studioAPI.uploadLogo(studioResponse.studio_id, logoFile);
+        console.log('Studio logo uploaded');
+      }
+
       setSuccess(true);
       
       // Redirect to sign in after 2 seconds
@@ -132,6 +179,47 @@ const SignUp: React.FC = () => {
             <option value="user">user (player)</option>
             <option value="studio">studio/publisher</option>
           </select>
+
+          {formData.role === 'studio' && (
+            <>
+              <input
+                type="text"
+                name="studioName"
+                value={studioData.studioName}
+                onChange={handleChange}
+                placeholder="studio name"
+                className="form-input"
+                required
+                disabled={loading || success}
+              />
+
+              <textarea
+                name="contactInfo"
+                value={studioData.contactInfo}
+                onChange={handleChange}
+                placeholder="contact info (optional)"
+                className="form-textarea"
+                disabled={loading || success}
+                rows={3}
+              />
+
+              <div className="form-file-input">
+                <label htmlFor="logo" className="file-label">
+                  {logoFile ? logoFile.name : 'upload studio logo'}
+                </label>
+                <input
+                  type="file"
+                  id="logo"
+                  name="logo"
+                  onChange={handleLogoChange}
+                  accept="image/*"
+                  className="file-input"
+                  required
+                  disabled={loading || success}
+                />
+              </div>
+            </>
+          )}
 
           <input
             type="password"

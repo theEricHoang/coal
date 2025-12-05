@@ -149,6 +149,51 @@ export const userAPI = {
 };
 
 // ============================================
+// Studio API
+// ============================================
+
+export const studioAPI = {
+  /**
+   * Create a new studio
+   * POST /studios/
+   */
+  createStudio: async (studioData: { name: string; contact_info?: string; user_id?: number }) => {
+    const response = await api.post('/studios/', studioData);
+    return response.data;
+  },
+
+  /**
+   * Upload studio logo
+   * POST /studios/{studio_id}/upload-logo
+   */
+  uploadLogo: async (studioId: number, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post(`/studios/${studioId}/upload-logo`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Upload user profile picture
+   * POST /users/{user_id}/upload-profile-picture
+   */
+  uploadProfilePicture: async (userId: number, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post(`/users/${userId}/upload-profile-picture`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+};
+
+// ============================================
 // Games API (placeholder for your game upload endpoints)
 // ============================================
 
@@ -164,6 +209,20 @@ export const gamesAPI = {
   
   getGameDetails: async (gameId: number) => {
     const response = await api.get(`/games/${gameId}`);
+    return response.data;
+  },
+
+  getAllGames: async (limit: number = 50, offset: number = 0) => {
+    const response = await api.get('/games/', {
+      params: { limit, offset },
+    });
+    return response.data;
+  },
+
+  searchGames: async (query: string, page: number = 1, pageSize: number = 50) => {
+    const response = await api.get('/games/search', {
+      params: { q: query, page, page_size: pageSize },
+    });
     return response.data;
   },
 };
