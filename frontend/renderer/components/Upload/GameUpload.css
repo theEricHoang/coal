@@ -1,7 +1,7 @@
 .upload-page {
   min-height: 100vh;
   background-color: var(--color-bg-primary);
-  padding: var(--spacing-2xl);
+  padding: calc(64px + var(--spacing-2xl)) var(--spacing-2xl) var(--spacing-2xl);
 }
 
 .upload-container {

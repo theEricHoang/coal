@@ -1,7 +1,7 @@
 .library-page {
   min-height: 100vh;
   background-color: var(--color-bg-primary);
-  padding-top: var(--spacing-lg);
+  padding-top: 64px;
 }
 
 .library-header {
