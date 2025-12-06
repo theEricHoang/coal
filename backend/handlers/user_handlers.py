@@ -52,6 +52,14 @@ class UserLibraryItem(BaseModel):
     hours_played: float
     status: str
     date_purchased: datetime
+    loaned_to: Optional[int] = None
+    loaned_to_username: Optional[str] = None
+    loan_duration: Optional[int] = None
+    is_borrowed: Optional[bool] = None
+    owner_id: Optional[int] = None
+    owner_username: Optional[str] = None
+    days_remaining: Optional[float] = None
+    tags: Optional[list[str]] = None
 
 
 class UserProfile(BaseModel):
@@ -147,6 +155,24 @@ def register_user(user: UserCreate, db=Depends(get_db)):
         )
 
 
+@router.get("/search")
+def search_users(
+    q: str,
+    limit: int = 5,
+    db=Depends(get_db)
+):
+    """Search users by username"""
+    user_dao = UserDAO(db)
+    users = user_dao.search_by_username(q, limit)
+    
+    # Convert profile_picture paths to full URLs
+    for user in users:
+        if user.get('profile_picture'):
+            user['profile_picture'] = f"http://localhost:8000/static/{user['profile_picture']}"
+    
+    return users
+
+
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db=Depends(get_db)):
     """Get user profile by ID"""
@@ -198,7 +224,7 @@ def get_user_library(
     offset: int = 0,
     db=Depends(get_db)
 ):
-    """Get user's game library with optional status filter"""
+    """Get user's game library with optional status filter (includes owned and borrowed games)"""
     user_dao = UserDAO(db)
     user_game_dao = UserGameDAO(db)
     
@@ -209,17 +235,32 @@ def get_user_library(
             detail="User not found"
         )
     
+    # Get owned games
     if status_filter:
-        games = user_game_dao.get_by_status(user_id, status_filter)
+        owned_games = user_game_dao.get_by_status(user_id, status_filter)
     else:
-        games = user_game_dao.get_by_user(user_id, limit, offset)
+        owned_games = user_game_dao.get_by_user(user_id, limit, offset)
+    
+    # Get borrowed games
+    borrowed_games = user_game_dao.get_borrowed_by_user(user_id)
+    
+    # Mark borrowed games
+    for game in borrowed_games:
+        game['is_borrowed'] = True
+    
+    # Mark owned games
+    for game in owned_games:
+        game['is_borrowed'] = False
+    
+    # Combine both lists
+    all_games = owned_games + borrowed_games
     
     # Convert thumbnail paths to full URLs
-    for game in games:
+    for game in all_games:
         if game.get('thumbnail'):
             game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
     
-    return games
+    return all_games
 
 
 @router.get("/{user_id}/reviews")

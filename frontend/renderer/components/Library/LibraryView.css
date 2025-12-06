@@ -89,6 +89,12 @@
   z-index: 10;
 }
 
+.library-hover-card-left {
+  left: auto;
+  right: 0;
+  flex-direction: row-reverse;
+}
+
 .library-item:hover .library-hover-card {
   opacity: 1;
   pointer-events: auto;
@@ -163,4 +169,90 @@
 
 .library-fab:active {
   transform: scale(1.0);
+}
+
+.library-item-loaned .library-thumbnail {
+  position: relative;
+}
+
+.library-item-loaned .library-thumbnail-image,
+.library-item-loaned .library-thumbnail-placeholder {
+  filter: blur(4px) grayscale(80%);
+  opacity: 0.5;
+}
+
+.library-loaned-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.library-loaned-text {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  padding: var(--spacing-md);
+  text-transform: lowercase;
+}
+
+.library-loan-btn {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: lowercase;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.library-loan-btn:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.library-return-btn {
+  background-color: var(--color-bg-tertiary);
+}
+
+.library-return-btn:hover {
+  background-color: var(--color-bg-primary);
+}
+
+.library-borrowed-badge {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: lowercase;
+  margin-bottom: var(--spacing-sm);
+  display: inline-block;
+}
+
+.library-hover-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-bg-tertiary);
+}
+
+.library-hover-tag {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  text-transform: lowercase;
 }

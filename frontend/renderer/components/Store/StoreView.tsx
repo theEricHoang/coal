@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { gamesAPI } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
+import { gamesAPI, authAPI } from '../../services/api';
 import { GameResponse } from '../../types';
 import './StoreView.css';
 
 const StoreView: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<GameResponse[]>([]);
   const [recommendedGames, setRecommendedGames] = useState<GameResponse[]>([]);
@@ -17,14 +19,18 @@ const StoreView: React.FC = () => {
   const loadDefaultGames = async () => {
     setLoading(true);
     try {
-      // For now, we'll load all games and split them
-      // In a real app, you'd have separate endpoints for recommended/featured
-      const response = await gamesAPI.getAllGames();
-      const games = response.games || [];
+      const userId = authAPI.getCurrentUserId();
       
-      // Split games for demo purposes
-      setRecommendedGames(games.slice(0, 6));
-      setFeaturedGames(games.slice(6, 12));
+      // Load personalized recommendations
+      if (userId) {
+        const recommendations = await gamesAPI.getRecommendations(userId, 10);
+        setRecommendedGames(Array.isArray(recommendations) ? recommendations : []);
+      }
+      
+      // Load all games for featured section
+      const allGamesResponse = await gamesAPI.getAllGames(50);
+      const allGames = allGamesResponse.games || allGamesResponse || [];
+      setFeaturedGames(Array.isArray(allGames) ? allGames : []);
     } catch (error) {
       console.error('Failed to load games:', error);
     } finally {
@@ -55,6 +61,10 @@ const StoreView: React.FC = () => {
     }
   };
 
+  const handleGameClick = (gameId: number) => {
+    navigate(`/game/${gameId}`);
+  };
+
   const renderGameGrid = (games: GameResponse[]) => {
     if (games.length === 0) {
       return <div className="store-empty">no games found</div>;
@@ -63,7 +73,11 @@ const StoreView: React.FC = () => {
     return (
       <div className="store-game-grid">
         {games.map((game) => (
-          <div key={game.game_id} className="store-game-item">
+          <div 
+            key={game.game_id} 
+            className="store-game-item"
+            onClick={() => handleGameClick(game.game_id)}
+          >
             {game.thumbnail ? (
               <img src={game.thumbnail} alt={game.title} className="store-game-thumbnail" />
             ) : (

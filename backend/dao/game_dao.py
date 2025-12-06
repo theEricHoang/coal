@@ -65,11 +65,12 @@ class GameDAO:
             return dict(result) if result else None
 
     def get_all(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
-        """Get all games with pagination"""
+        """Get all games with pagination (only studio-published games)"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
                    tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
+            WHERE studio_id IS NOT NULL
             ORDER BY created_at DESC
             LIMIT %s OFFSET %s
         """
@@ -78,12 +79,12 @@ class GameDAO:
             return [dict(row) for row in cursor.fetchall()]
 
     def search_by_title(self, title: str, limit: int = 100) -> List[Dict[str, Any]]:
-        """Search games by title (case-insensitive partial match)"""
+        """Search games by title (case-insensitive partial match, only studio-published games)"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
                    tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
-            WHERE title ILIKE %s
+            WHERE title ILIKE %s AND studio_id IS NOT NULL
             ORDER BY title
             LIMIT %s
         """
@@ -92,12 +93,12 @@ class GameDAO:
             return [dict(row) for row in cursor.fetchall()]
 
     def get_by_genre(self, genre: str, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
-        """Get games by genre"""
+        """Get games by genre (only studio-published games)"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
                    tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
-            WHERE genre ILIKE %s
+            WHERE genre ILIKE %s AND studio_id IS NOT NULL
             ORDER BY title
             LIMIT %s OFFSET %s
         """
@@ -106,12 +107,12 @@ class GameDAO:
             return [dict(row) for row in cursor.fetchall()]
 
     def get_by_platform(self, platform: str, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
-        """Get games by platform"""
+        """Get games by platform (only studio-published games)"""
         query = """
             SELECT game_id, title, genre, developer, release_date, platform, 
                    tags, description, price, thumbnail, studio_id, created_at, updated_at
             FROM games
-            WHERE platform ILIKE %s
+            WHERE platform ILIKE %s AND studio_id IS NOT NULL
             ORDER BY title
             LIMIT %s OFFSET %s
         """
@@ -172,9 +173,53 @@ class GameDAO:
             raise e
 
     def count(self) -> int:
-        """Get total count of games"""
-        query = "SELECT COUNT(*) as count FROM games"
+        """Get total count of studio-published games"""
+        query = "SELECT COUNT(*) as count FROM games WHERE studio_id IS NOT NULL"
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query)
             result = cursor.fetchone()
             return result['count'] if result else 0
+
+    def get_recommendations(self, user_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+        """Get game recommendations based on user's library tags"""
+        query = """
+            WITH user_tags AS (
+                -- Get all tags from user's owned games
+                SELECT unnest(g.tags) as tag
+                FROM user_games ug
+                JOIN games g ON ug.game_id = g.game_id
+                WHERE ug.user_id = %s AND g.tags IS NOT NULL
+            ),
+            tag_counts AS (
+                -- Count frequency of each tag
+                SELECT tag, COUNT(*) as count
+                FROM user_tags
+                GROUP BY tag
+                ORDER BY count DESC
+                LIMIT 10
+            ),
+            user_owned_games AS (
+                -- Get games user already owns
+                SELECT game_id FROM user_games WHERE user_id = %s
+            )
+            -- Find games with matching tags that user doesn't own
+            SELECT DISTINCT g.game_id, g.title, g.genre, g.developer, g.release_date, 
+                   g.platform, g.tags, g.description, g.price, g.thumbnail, 
+                   g.studio_id, g.created_at, g.updated_at,
+                   (SELECT COUNT(*) 
+                    FROM unnest(g.tags) t 
+                    WHERE t IN (SELECT tag FROM tag_counts)) as matching_tags
+            FROM games g
+            WHERE g.game_id NOT IN (SELECT game_id FROM user_owned_games)
+              AND g.studio_id IS NOT NULL
+              AND g.tags IS NOT NULL
+              AND EXISTS (
+                SELECT 1 FROM unnest(g.tags) t 
+                WHERE t IN (SELECT tag FROM tag_counts)
+              )
+            ORDER BY matching_tags DESC, g.created_at DESC
+            LIMIT %s
+        """
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (user_id, user_id, limit))
+            return [dict(row) for row in cursor.fetchall()]

@@ -21,6 +21,8 @@ const AddGameModal: React.FC<AddGameModalProps> = ({ isOpen, onClose, onGameAdde
     releaseDate: '',
   });
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -35,6 +37,21 @@ const AddGameModal: React.FC<AddGameModalProps> = ({ isOpen, onClose, onGameAdde
     if (files && files.length > 0) {
       setThumbnailFile(files[0]);
     }
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const trimmedTag = tagInput.trim();
+      if (trimmedTag && !tags.includes(trimmedTag)) {
+        setTags([...tags, trimmedTag]);
+        setTagInput('');
+      }
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,6 +76,7 @@ const AddGameModal: React.FC<AddGameModalProps> = ({ isOpen, onClose, onGameAdde
         platform: formData.platform || null,
         price: formData.price ? parseFloat(formData.price) : null,
         release_date: formData.releaseDate || null,
+        tags: tags.length > 0 ? tags : null,
       };
 
       const gameResponse = await fetch('http://localhost:8000/games/', {
@@ -119,6 +137,8 @@ const AddGameModal: React.FC<AddGameModalProps> = ({ isOpen, onClose, onGameAdde
         releaseDate: '',
       });
       setThumbnailFile(null);
+      setTags([]);
+      setTagInput('');
     } catch (err: any) {
       console.error('Upload error:', err);
       setError(err.message || 'Failed to add game. Please try again.');
@@ -226,6 +246,34 @@ const AddGameModal: React.FC<AddGameModalProps> = ({ isOpen, onClose, onGameAdde
               disabled={uploading}
               rows={3}
               className="form-textarea"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">tags</label>
+            <div className="tags-container">
+              {tags.map((tag, index) => (
+                <span key={index} className="tag">
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    className="tag-remove"
+                    disabled={uploading}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleTagKeyDown}
+              placeholder="type and press enter to add tags"
+              disabled={uploading}
+              className="form-input"
             />
           </div>
 

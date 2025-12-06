@@ -7,6 +7,7 @@ import SignUp from './components/Auth/SignUp';
 import LibraryView from './components/Library/LibraryView';
 import PublishView from './components/Publish/PublishView';
 import StoreView from './components/Store/StoreView';
+import GameDetail from './components/Store/GameDetail';
 import Navbar from './components/Layout/Navbar';
 
 
@@ -59,6 +60,12 @@ const App: React.FC = () => {
           path="/store" 
           element={
             isAuthenticated ? <StoreView /> : <Navigate to="/signin" />
+          } 
+        />
+        <Route 
+          path="/game/:gameId" 
+          element={
+            isAuthenticated ? <GameDetail /> : <Navigate to="/signin" />
           } 
         />
         <Route path="/" element={<Navigate to={getDefaultRoute()} />} />

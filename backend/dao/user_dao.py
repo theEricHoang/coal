@@ -119,3 +119,16 @@ class UserDAO:
             cursor.execute(query)
             result = cursor.fetchone()
             return result['count'] if result else 0
+
+    def search_by_username(self, username: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """Search users by username (case-insensitive partial match)"""
+        query = """
+            SELECT user_id, username, email, role, profile_picture, created_at, updated_at
+            FROM users
+            WHERE username ILIKE %s
+            ORDER BY username
+            LIMIT %s
+        """
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (f'%{username}%', limit))
+            return [dict(row) for row in cursor.fetchall()]

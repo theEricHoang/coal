@@ -114,6 +114,39 @@ def create_game(game: GameCreate, db=Depends(get_db)):
         )
 
 
+@router.get("/recommendations/{user_id}", response_model=List[GameResponse])
+def get_recommendations(
+    user_id: int,
+    limit: int = Query(10, ge=1, le=50),
+    db=Depends(get_db)
+):
+    """Get personalized game recommendations based on user's library"""
+    game_dao = GameDAO(db)
+    user_game_dao = UserGameDAO(db)
+    
+    recommendations = game_dao.get_recommendations(user_id, limit)
+    
+    # Convert thumbnail paths to full URLs
+    for game in recommendations:
+        if game.get('thumbnail'):
+            game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
+    
+    # If user has no games or no recommendations, return recent games that user doesn't own
+    if not recommendations:
+        all_games = game_dao.get_all(limit=limit * 3)  # Get more to filter from
+        user_library = user_game_dao.get_by_user(user_id)
+        owned_game_ids = {item['game_id'] for item in user_library}
+        
+        # Filter out owned games and limit results
+        recommendations = [game for game in all_games if game['game_id'] not in owned_game_ids][:limit]
+        
+        for game in recommendations:
+            if game.get('thumbnail'):
+                game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
+    
+    return recommendations
+
+
 @router.get("/search", response_model=GameSearchResult)
 def search_games(
     q: Optional[str] = Query(None, description="Search query"),
@@ -227,6 +260,12 @@ def list_games(
     """List all games with pagination"""
     game_dao = GameDAO(db)
     games = game_dao.get_all(limit=limit, offset=offset)
+    
+    # Convert thumbnail paths to full URLs
+    for game in games:
+        if game.get('thumbnail'):
+            game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
+    
     return games
 
 

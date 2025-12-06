@@ -194,6 +194,14 @@ export interface UserLibraryItem {
   hours_played: number;
   status: string;
   date_purchased: string; // ISO date string
+  loaned_to?: number;
+  loaned_to_username?: string;
+  loan_duration?: number;
+  is_borrowed?: boolean;
+  owner_id?: number;
+  owner_username?: string;
+  days_remaining?: number;
+  tags?: string[];
 }
 
 // Review Types

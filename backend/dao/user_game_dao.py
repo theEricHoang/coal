@@ -77,9 +77,11 @@ class UserGameDAO:
             SELECT ug.ownership_id, ug.user_id, ug.game_id, ug.type, ug.options, ug.date_purchased, 
                    ug.hours_played, ug.status, ug.loaned_to, ug.loan_duration, ug.game_studio_id, 
                    ug.created_at, ug.updated_at,
-                   g.title, g.genre, g.platform, g.price, g.thumbnail
+                   g.title, g.genre, g.platform, g.price, g.thumbnail, g.tags,
+                   u.username as loaned_to_username
             FROM user_games ug
             JOIN games g ON ug.game_id = g.game_id
+            LEFT JOIN users u ON ug.loaned_to = u.user_id
             WHERE ug.user_id = %s
             ORDER BY ug.date_purchased DESC
             LIMIT %s OFFSET %s
@@ -94,9 +96,11 @@ class UserGameDAO:
             SELECT ug.ownership_id, ug.user_id, ug.game_id, ug.type, ug.options, ug.date_purchased, 
                    ug.hours_played, ug.status, ug.loaned_to, ug.loan_duration, ug.game_studio_id, 
                    ug.created_at, ug.updated_at,
-                   g.title, g.genre, g.platform, g.price, g.thumbnail
+                   g.title, g.genre, g.platform, g.price, g.thumbnail, g.tags,
+                   u.username as loaned_to_username
             FROM user_games ug
             JOIN games g ON ug.game_id = g.game_id
+            LEFT JOIN users u ON ug.loaned_to = u.user_id
             WHERE ug.user_id = %s AND ug.status = %s
             ORDER BY ug.date_purchased DESC
         """
@@ -192,3 +196,22 @@ class UserGameDAO:
             cursor.execute(query, (user_id,))
             result = cursor.fetchone()
             return result['count'] if result else 0
+
+    def get_borrowed_by_user(self, user_id: int) -> List[Dict[str, Any]]:
+        """Get all games borrowed by a user (loaned to them)"""
+        query = """
+            SELECT ug.ownership_id, ug.user_id as owner_id, ug.game_id, ug.type, ug.options, 
+                   ug.date_purchased, ug.hours_played, ug.status, ug.loaned_to, 
+                   ug.loan_duration, ug.game_studio_id, ug.created_at, ug.updated_at,
+                   g.title, g.genre, g.platform, g.price, g.thumbnail, g.tags,
+                   owner.username as owner_username,
+                   EXTRACT(DAY FROM (ug.updated_at + (ug.loan_duration || ' days')::INTERVAL - CURRENT_TIMESTAMP)) as days_remaining
+            FROM user_games ug
+            JOIN games g ON ug.game_id = g.game_id
+            JOIN users owner ON ug.user_id = owner.user_id
+            WHERE ug.loaned_to = %s
+            ORDER BY ug.updated_at DESC
+        """
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (user_id,))
+            return [dict(row) for row in cursor.fetchall()]

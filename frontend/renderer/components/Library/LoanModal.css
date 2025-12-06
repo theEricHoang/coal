@@ -1,0 +1,301 @@
+.loan-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loan-modal-content {
+  background-color: var(--color-bg-secondary);
+  padding: var(--spacing-2xl);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.loan-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.loan-modal-title {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  text-transform: lowercase;
+}
+
+.loan-modal-close {
+  background: none;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-2xl);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loan-modal-close:hover {
+  color: var(--color-primary);
+}
+
+.loan-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.loan-modal-game-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-tertiary);
+}
+
+.loan-modal-label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-transform: lowercase;
+}
+
+.loan-modal-game-title {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.loan-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.loan-form-label {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  text-transform: lowercase;
+}
+
+.loan-search-container {
+  position: relative;
+}
+
+.loan-search-input {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  border: none;
+}
+
+.loan-search-input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.loan-search-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loan-search-loading {
+  padding: var(--spacing-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.loan-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--color-bg-primary);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  margin-top: 2px;
+}
+
+.loan-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.loan-dropdown-item:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.loan-dropdown-avatar,
+.loan-dropdown-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.loan-dropdown-avatar {
+  object-fit: cover;
+}
+
+.loan-dropdown-avatar-placeholder {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+}
+
+.loan-dropdown-username {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+}
+
+.loan-dropdown-empty {
+  padding: var(--spacing-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.loan-selected-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-primary);
+}
+
+.loan-user-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.loan-user-avatar,
+.loan-user-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.loan-user-avatar {
+  object-fit: cover;
+}
+
+.loan-user-avatar-placeholder {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+}
+
+.loan-user-username {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.loan-remove-user {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-2xl);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loan-remove-user:hover {
+  color: var(--color-text-primary);
+}
+
+.loan-form-input {
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  border: none;
+}
+
+.loan-form-input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.loan-form-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loan-modal-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.loan-btn {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: none;
+  text-transform: lowercase;
+}
+
+.loan-btn-cancel {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.loan-btn-cancel:hover {
+  background-color: var(--color-bg-primary);
+}
+
+.loan-btn-submit {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.loan-btn-submit:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.loan-btn-submit:disabled {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.loan-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

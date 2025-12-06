@@ -87,7 +87,7 @@ def get_user_library(
     offset: int = Query(0, ge=0),
     db=Depends(get_db)
 ):
-    """Get user's game library with optional filtering"""
+    """Get user's game library with optional filtering (includes owned and borrowed games)"""
     user_dao = UserDAO(db)
     user_game_dao = UserGameDAO(db)
     
@@ -98,13 +98,28 @@ def get_user_library(
             detail="User not found"
         )
     
+    # Get owned games
     if status_filter:
-        games = user_game_dao.get_by_status(user_id, status_filter)
+        owned_games = user_game_dao.get_by_status(user_id, status_filter)
     else:
-        games = user_game_dao.get_by_user(user_id, limit, offset)
+        owned_games = user_game_dao.get_by_user(user_id, limit, offset)
+    
+    # Get borrowed games
+    borrowed_games = user_game_dao.get_borrowed_by_user(user_id)
+    
+    # Mark borrowed games
+    for game in borrowed_games:
+        game['is_borrowed'] = True
+    
+    # Mark owned games
+    for game in owned_games:
+        game['is_borrowed'] = False
+    
+    # Combine both lists
+    all_games = owned_games + borrowed_games
     
     # Convert thumbnail paths to full URLs
-    for game in games:
+    for game in all_games:
         if game.get('thumbnail'):
             game['thumbnail'] = f"http://localhost:8000/static/{game['thumbnail']}"
     
@@ -113,7 +128,7 @@ def get_user_library(
     return {
         "user_id": user_id,
         "total_games": total_games,
-        "games": games
+        "games": all_games
     }
 
 
@@ -134,6 +149,84 @@ def get_loaned_games(user_id: int, db=Depends(get_db)):
         "user_id": user_id,
         "loaned_games": loaned_games
     }
+
+
+@router.patch("/loan/{ownership_id}")
+def loan_game(
+    ownership_id: int,
+    loan_data: Dict[str, Any],
+    db=Depends(get_db)
+):
+    """Loan a game to another user"""
+    user_game_dao = UserGameDAO(db)
+    user_dao = UserDAO(db)
+    
+    # Verify ownership exists
+    ownership = user_game_dao.get_by_id(ownership_id)
+    if not ownership:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Library entry not found"
+        )
+    
+    # Verify the borrower exists
+    loaned_to = loan_data.get('loaned_to')
+    if not loaned_to or not user_dao.get_by_id(loaned_to):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User to loan to not found"
+        )
+    
+    try:
+        updated = user_game_dao.update(
+            ownership_id,
+            loaned_to=loaned_to,
+            loan_duration=loan_data.get('loan_duration', 7)
+        )
+        return updated
+    except psycopg2.Error as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to loan game"
+        )
+
+
+@router.patch("/return-loan/{ownership_id}")
+def return_loan(
+    ownership_id: int,
+    db=Depends(get_db)
+):
+    """Return a borrowed game early"""
+    user_game_dao = UserGameDAO(db)
+    
+    # Verify ownership exists
+    ownership = user_game_dao.get_by_id(ownership_id)
+    if not ownership:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Library entry not found"
+        )
+    
+    # Verify the game is actually loaned
+    if not ownership.get('loaned_to'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Game is not currently loaned"
+        )
+    
+    try:
+        # Clear loan fields
+        updated = user_game_dao.update(
+            ownership_id,
+            loaned_to=None,
+            loan_duration=None
+        )
+        return updated
+    except psycopg2.Error as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to return loan"
+        )
 
 
 @router.patch("/{ownership_id}")

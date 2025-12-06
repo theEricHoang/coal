@@ -146,6 +146,17 @@ export const userAPI = {
   deleteUser: async (userId: number): Promise<void> => {
     await api.delete(`/users/${userId}`);
   },
+
+  /**
+   * Search users by username
+   * GET /users/search
+   */
+  searchUsers: async (query: string, limit: number = 5): Promise<UserResponse[]> => {
+    const response = await api.get<UserResponse[]>('/users/search', {
+      params: { q: query, limit },
+    });
+    return response.data;
+  },
 };
 
 // ============================================
@@ -222,6 +233,60 @@ export const gamesAPI = {
   searchGames: async (query: string, page: number = 1, pageSize: number = 50) => {
     const response = await api.get('/games/search', {
       params: { q: query, page, page_size: pageSize },
+    });
+    return response.data;
+  },
+
+  getRecommendations: async (userId: number, limit: number = 10) => {
+    const response = await api.get(`/games/recommendations/${userId}`, {
+      params: { limit },
+    });
+    return response.data;
+  },
+};
+
+export const libraryAPI = {
+  getUserLibrary: async (userId: number, statusFilter?: string, limit: number = 50, offset: number = 0) => {
+    const response = await api.get(`/library/${userId}`, {
+      params: { status_filter: statusFilter, limit, offset },
+    });
+    return response.data;
+  },
+
+  addGameToLibrary: async (data: {
+    user_id: number;
+    game_id: number;
+    type: string;
+    options?: any;
+    game_studio_id?: number | null;
+  }) => {
+    const response = await api.post('/library/', data);
+    return response.data;
+  },
+};
+
+export const reviewsAPI = {
+  createReview: async (data: {
+    game_id: number;
+    user_id: number;
+    rating: number;
+    review_text: string | null;
+    game_studio_id?: number | null;
+  }) => {
+    const response = await api.post('/reviews/', data);
+    return response.data;
+  },
+
+  getGameReviews: async (gameId: number, limit: number = 20, offset: number = 0) => {
+    const response = await api.get(`/games/${gameId}/reviews`, {
+      params: { limit, offset },
+    });
+    return response.data;
+  },
+
+  getUserReviews: async (userId: number, limit: number = 20, offset: number = 0) => {
+    const response = await api.get(`/users/${userId}/reviews`, {
+      params: { limit, offset },
     });
     return response.data;
   },
